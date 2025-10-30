@@ -45,6 +45,15 @@ long duracao;
 int distancia;
 
 // ==========================
+// Controle de tempo
+// ==========================
+unsigned long tempoAnterior = 0;
+int estado = 1; // começa no verde
+unsigned long intervalos[] = {6000, 4000, 2000}; // vermelho, verde, amarelo
+
+bool objetoDetectado = false;
+
+// ==========================
 // Função: medirDistancia()
 // ==========================
 int medirDistancia() {
@@ -53,18 +62,11 @@ int medirDistancia() {
   digitalWrite(trigPin, HIGH);
   delayMicroseconds(10);
   digitalWrite(trigPin, LOW);
+
   duracao = pulseIn(echoPin, HIGH, 20000);
   distancia = duracao * 0.034 / 2;
-  return distancia;
-}
 
-// ==========================
-// Função: acendeLed()
-// ==========================
-void acendeLed(int *pino, int tempo) {
-  digitalWrite(*pino, HIGH);
-  delay(tempo);
-  digitalWrite(*pino, LOW);
+  return distancia;
 }
 
 // ==========================
@@ -74,9 +76,9 @@ void setup() {
   pinMode(*pVermelho, OUTPUT);
   pinMode(*pAmarelo, OUTPUT);
   pinMode(*pVerde, OUTPUT);
+
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
-  Serial.begin(9600);
 }
 
 // ==========================
@@ -84,24 +86,36 @@ void setup() {
 // ==========================
 void loop() {
   int d = medirDistancia();
-  Serial.print("Distancia: ");
-  Serial.print(d);
-  Serial.println(" cm");
+  unsigned long tempoAtual = millis();
 
+  // --- Verifica detecção ---
   if (d > 0 && d <= 10) {
-    // Pedestre detectado → vermelho
+    // Objeto detectado → força vermelho
+    objetoDetectado = true;
     digitalWrite(*pVermelho, HIGH);
     digitalWrite(*pAmarelo, LOW);
     digitalWrite(*pVerde, LOW);
-    delay(3000);
-  } else {
-    // Ciclo normal
-    acendeLed(pVermelho, 6000);
-    acendeLed(pVerde, 4000);
-    acendeLed(pAmarelo, 2000);
+    return;
+  } 
+  else {
+    // Objeto saiu → reinicia ciclo no verde
+    if (objetoDetectado) {
+      objetoDetectado = false;
+      estado = 1; // volta para verde
+      tempoAnterior = tempoAtual; // reinicia contagem de tempo
+    }
   }
 
-  delay(500);
+  // --- Ciclo normal ---
+  if (tempoAtual - tempoAnterior >= intervalos[estado]) {
+    tempoAnterior = tempoAtual;
+    estado = (estado + 1) % 3; // 0=vermelho, 1=verde, 2=amarelo
+  }
+
+  // Define LED conforme o estado
+  digitalWrite(*pVermelho, estado == 0 ? HIGH : LOW);
+  digitalWrite(*pVerde, estado == 1 ? HIGH : LOW);
+  digitalWrite(*pAmarelo, estado == 2 ? HIGH : LOW);
 }
 
 ```
