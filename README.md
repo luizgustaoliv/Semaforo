@@ -103,3 +103,13 @@ void loop() {
 
   delay(500);
 }
+
+```
+
+## Avaliação dos Pares
+
+| Avaliador | Montagem física (4) | Pontos | Temporização (3) | Pontos | Código & estrutura (3) | Pontos | Observações gerais                                                         | Total (10) |
+|-----------|----------------------|--------|-------------------|--------|------------------------|--------|----------------------------------------------------------------------------|------------|
+| Kaian     | Contempla parcialmente | 3.9    | contempla          | 3    | Contempla               | 3    | Boa implementação do sistema de proximidade, só pecou na organização dos fios | 9.9        |
+| Lívia     | Contempla parcialmente | 3.8    | contempla          | 3   | Contempla               | 3    | Código com estrutura avançada, estrutura física um pouco confusa | 9.8        |
+
